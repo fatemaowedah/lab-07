@@ -16,6 +16,7 @@ app.get('/', (request, response) => {
 
 app.get('/location', locationHandler);
 app.get('/weather', weatherHandler);
+app.get('/trails', trailsHandler);
 app.use('*', notFoundHandler);
 app.use(errorHandler);
 
@@ -74,7 +75,32 @@ function Weather(day) {
     this.forecast = day.weather.description;
     this.time = new Date(day.valid_date).toString().split(' ').slice(0, 4).join(' ');
 }
+//////////////////////////////////////////
+function trailsHandler(request, response) {
+    superagent(
+        `https://www.hikingproject.com/data/get-trails?lat=${request.query.data.latitude}&lon=${request.guery.data.longitude}&maxDistance=10&key=${process.env.TRAIL_API_KEY}`
+    )
+        .then((trailData) => {
+            const TRData = trailData.body.data.map((TT) => {
+                return new Trails(TT);
+            });
+            response.status(200).json(TRData);
+        })
+        .catch((error) => errorHandler(error, request, response))
+}
 
+function Trails(trail) {
+    this.name = trail.name;
+    this.location = trail.location;
+    this.length = trail.length;
+    this.stars = trail.stars;
+    this.star_votes = trail.starVotes;
+    this.summary = trail.summary;
+    this.trail_url = trail.url;
+    this.conditions = trial.conditionStatus;
+    this.condition_date = trail.conditionDetails.slice(0, 10);
+    this.condition_time = trail.conditionDetails.slice(12, 19);
+}
 //////////////////////////////////////////
 app.use('*', notFoundHandler);
 function notFoundHandler(request, response) {
