@@ -9,7 +9,8 @@ const superagent = require('superagent');
 const PORT = process.env.PORT || 4000;
 const app = express();
 app.use(cors());
-
+let lattt;
+let longg;
 app.get('/', (request, response) => {
     response.send('Home Page !');
 });
@@ -36,11 +37,13 @@ function locationHandler(request, response) {
         .then((res) => {
             const geoData = res.body;
             const locationData = new Location(city, geoData);
+            lattt = locationData.latitude;
+            longg = locationData.longitude;
             response.status(200).json(locationData);
         })
         .catch((error) => errorHandler(error, request, response));
 }
-console.log(process.env.GEOCODE_API_KEY);
+
 function Location(city, geoData) {
     this.search_query = city;
     this.formatted_query = geoData[0].display_name;
@@ -78,28 +81,28 @@ function Weather(day) {
 //////////////////////////////////////////
 function trailsHandler(request, response) {
     superagent(
-        `https://www.hikingproject.com/data/get-trails?lat=${request.query.data.latitude}&lon=${request.guery.data.longitude}&maxDistance=10&key=${process.env.TRAIL_API_KEY}`
+        `https://www.hikingproject.com/data/get-trails?lat=${lattt}&lon=${longg}&maxDistance=150&key=${process.env.TRAIL_API_KEY}`
     )
-        .then((trailData) => {
-            const TRData = trailData.body.data.map((TT) => {
-                return new Trails(TT);
-            });
-            response.status(200).json(TRData);
-        })
-        .catch((error) => errorHandler(error, request, response))
+    .then((trialData) => {
+        const TData = trialData.body.trails.map((TT) => {
+            return new Trails(TT);
+        });
+        response.status(200).json(TData);
+    })
+    .catch((error) => errorHandler(error, request, response))
 }
 
-function Trails(trail) {
-    this.name = trail.name;
-    this.location = trail.location;
-    this.length = trail.length;
-    this.stars = trail.stars;
-    this.star_votes = trail.starVotes;
-    this.summary = trail.summary;
-    this.trail_url = trail.url;
-    this.conditions = trial.conditionStatus;
-    this.condition_date = trail.conditionDetails.slice(0, 10);
-    this.condition_time = trail.conditionDetails.slice(12, 19);
+function Trails(TT) {
+    this.name = TT.name;
+    this.location = TT.location;
+    this.length = TT.length;
+    this.stars = TT.stars;
+    this.star_votes = TT.starVotes;
+    this.summary = TT.summary;
+    this.trail_url = TT.url;
+    this.conditions = TT.conditionStatus;
+    this.condition_date = TT.conditionDetails.slice(0, 10);
+    this.condition_time = TT.conditionDetails.slice(12, 19);
 }
 //////////////////////////////////////////
 app.use('*', notFoundHandler);
