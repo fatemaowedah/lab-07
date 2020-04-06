@@ -9,13 +9,15 @@ const superagent = require('superagent');
 const PORT = process.env.PORT || 4000;
 const app = express();
 app.use(cors());
-
+let lattt;
+let longg;
 app.get('/', (request, response) => {
     response.send('Home Page !');
 });
 
 app.get('/location', locationHandler);
 app.get('/weather', weatherHandler);
+app.get('/trails', trailsHandler);
 app.use('*', notFoundHandler);
 app.use(errorHandler);
 
@@ -35,11 +37,13 @@ function locationHandler(request, response) {
         .then((res) => {
             const geoData = res.body;
             const locationData = new Location(city, geoData);
+            lattt = locationData.latitude;
+            longg = locationData.longitude;
             response.status(200).json(locationData);
         })
         .catch((error) => errorHandler(error, request, response));
 }
-console.log(process.env.GEOCODE_API_KEY);
+
 function Location(city, geoData) {
     this.search_query = city;
     this.formatted_query = geoData[0].display_name;
@@ -74,7 +78,32 @@ function Weather(day) {
     this.forecast = day.weather.description;
     this.time = new Date(day.valid_date).toString().split(' ').slice(0, 4).join(' ');
 }
+//////////////////////////////////////////
+function trailsHandler(request, response) {
+    superagent(
+        `https://www.hikingproject.com/data/get-trails?lat=${lattt}&lon=${longg}&maxDistance=150&key=${process.env.TRAIL_API_KEY}`
+    )
+    .then((trialData) => {
+        const TData = trialData.body.trails.map((TT) => {
+            return new Trails(TT);
+        });
+        response.status(200).json(TData);
+    })
+    .catch((error) => errorHandler(error, request, response))
+}
 
+function Trails(TT) {
+    this.name = TT.name;
+    this.location = TT.location;
+    this.length = TT.length;
+    this.stars = TT.stars;
+    this.star_votes = TT.starVotes;
+    this.summary = TT.summary;
+    this.trail_url = TT.url;
+    this.conditions = TT.conditionStatus;
+    this.condition_date = TT.conditionDetails.slice(0, 10);
+    this.condition_time = TT.conditionDetails.slice(12, 19);
+}
 //////////////////////////////////////////
 app.use('*', notFoundHandler);
 function notFoundHandler(request, response) {
