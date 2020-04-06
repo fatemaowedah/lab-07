@@ -9,8 +9,6 @@ const superagent = require('superagent');
 const PORT = process.env.PORT || 4000;
 const app = express();
 app.use(cors());
-let lattt;
-let longg;
 app.get('/', (request, response) => {
     response.send('Home Page !');
 });
@@ -37,8 +35,6 @@ function locationHandler(request, response) {
         .then((res) => {
             const geoData = res.body;
             const locationData = new Location(city, geoData);
-            lattt = locationData.latitude;
-            longg = locationData.longitude;
             response.status(200).json(locationData);
         })
         .catch((error) => errorHandler(error, request, response));
@@ -81,7 +77,7 @@ function Weather(day) {
 //////////////////////////////////////////
 function trailsHandler(request, response) {
     superagent(
-        `https://www.hikingproject.com/data/get-trails?lat=${lattt}&lon=${longg}&maxDistance=150&key=${process.env.TRAIL_API_KEY}`
+        `https://www.hikingproject.com/data/get-trails?lat=${request.query.latitude}&lon=${request.query.longitude}&maxDistance=400&key=${process.env.TRAIL_API_KEY}`
     )
     .then((trialData) => {
         const TData = trialData.body.trails.map((TT) => {
@@ -105,11 +101,11 @@ function Trails(TT) {
     this.condition_time = TT.conditionDetails.slice(12, 19);
 }
 //////////////////////////////////////////
-app.use('*', notFoundHandler);
 function notFoundHandler(request, response) {
-    response.status(500).send('Sorry, something went wrong');
-}
-function errorHandler(error, request, response) {
+    response.status(404).send('NOT FOUND!');
+  }
+  
+  function errorHandler(error, request, response) {
     response.status(500).send(error);
-}
+  }
 app.listen(PORT, () => console.log(`the server is up and running on ${PORT}`));
