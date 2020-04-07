@@ -97,8 +97,8 @@ function Trails(TT) {
     this.summary = TT.summary;
     this.trail_url = TT.trail_url;
     this.conditions = TT.conditions;
-    // this.condition_date =new Date(TT.conditionDetails.slice(0, 10));
-    // this.condition_time = TT.conditionDetails.slice(12, 19);
+    // this.condition_date =new Date(TT.conditionDate.slice(0, 10));
+    // this.condition_time = new Date(TT.conditionDate.slice(12, 19));
 }
 //////////////////////////////////////////
 function notFoundHandler(request, response) {
