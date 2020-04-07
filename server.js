@@ -93,11 +93,11 @@ function Trails(TT) {
     this.location = TT.location;
     this.length = TT.length;
     this.stars = TT.stars;
-    this.star_votes = TT.starVotes;
+    this.star_votes = TT.star_votes;
     this.summary = TT.summary;
-    this.trail_url = TT.url;
-    this.conditions = TT.conditionStatus;
-    this.condition_date = TT.conditionDetails.slice(0, 10);
+    this.trail_url = TT.trail_url;
+    this.conditions = TT.conditions;
+    this.condition_date =new Date(TT.conditionDetails.slice(0, 10));
     this.condition_time = TT.conditionDetails.slice(12, 19);
 }
 //////////////////////////////////////////
