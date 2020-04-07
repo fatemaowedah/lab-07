@@ -93,12 +93,12 @@ function Trails(TT) {
     this.location = TT.location;
     this.length = TT.length;
     this.stars = TT.stars;
-    this.star_votes = TT.star_votes;
+    this.star_votes = TT.starVotes;
     this.summary = TT.summary;
     this.trail_url = TT.trail_url;
-    this.conditions = TT.conditions;
-    this.condition_date =TT.conditionDate.split(' ')[0];
-    this.condition_time =TT.conditionDate.split(' ')[1];
+    this.conditions = TT.conditionStatus;
+    this.condition_date =TT.conditionDate.slice(0,10);
+    this.condition_time =TT.conditionDate.slice(12,19);
 }
 //////////////////////////////////////////
 function notFoundHandler(request, response) {
